@@ -42,28 +42,23 @@ def recognize_candlestick(df):
         if len(row[candle_names]) - sum(row[candle_names] == 0) == 0:
             df.loc[index,'candlestick_pattern'] = "NO_PATTERN"
             df.loc[index, 'candlestick_match_count'] = 0
-        # single pattern found
         elif len(row[candle_names]) - sum(row[candle_names] == 0) == 1:
             # bull pattern 100 or 200
             if any(row[candle_names].values > 0):
-                pattern = list(compress(row[candle_names].keys(), row[candle_names].values != 0))[0] + '_Bull'
-                df.loc[index, 'candlestick_pattern'] = pattern
-                df.loc[index, 'candlestick_match_count'] = 1
-            # bear pattern -100 or -200
+                pattern = f'{list(compress(row[candle_names].keys(), row[candle_names].values != 0))[0]}_Bull'
             else:
-                pattern = list(compress(row[candle_names].keys(), row[candle_names].values != 0))[0] + '_Bear'
-                df.loc[index, 'candlestick_pattern'] = pattern
-                df.loc[index, 'candlestick_match_count'] = 1
-        # multiple patterns matched -- select best performance
+                pattern = f'{list(compress(row[candle_names].keys(), row[candle_names].values != 0))[0]}_Bear'
+            df.loc[index, 'candlestick_pattern'] = pattern
+            df.loc[index, 'candlestick_match_count'] = 1
         else:
             # filter out pattern names from bool list of values
             patterns = list(compress(row[candle_names].keys(), row[candle_names].values != 0))
             container = []
             for pattern in patterns:
                 if row[pattern] > 0:
-                    container.append(pattern + '_Bull')
+                    container.append(f'{pattern}_Bull')
                 else:
-                    container.append(pattern + '_Bear')
+                    container.append(f'{pattern}_Bear')
             rank_list = [candle_rankings[p] for p in container]
             if len(rank_list) == len(container):
                 rank_index_best = rank_list.index(min(rank_list))
